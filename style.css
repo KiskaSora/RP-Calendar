@@ -1,0 +1,435 @@
+/* Sora RP Calendar — style.css
+   Все селекторы имеют префикс .sora-* / #sora_*, чтобы не конфликтовать с темами и другими расширениями. */
+
+#sora_rp_calendar.sora-cal {
+    --sora-text: var(--sora-c-text, var(--SmartThemeBodyColor, #d9d4dc));
+    --sora-border: var(--sora-c-border, var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.24)));
+    --sora-bg: var(--sora-c-bg, var(--SmartThemeBlurTintColor, #1f1a24));
+    --sora-accent: var(--sora-c-border, var(--SmartThemeQuoteColor, var(--sora-text)));
+    --sora-op: 55%;
+
+    position: relative;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 12px);
+    max-width: 100%;
+    min-height: 34px;
+    margin: 4px auto 3px;
+    padding: 5px 38px 5px 30px;
+    overflow: hidden;
+    color: var(--sora-text);
+    background: var(--sora-bg);
+    background: color-mix(in srgb, var(--sora-bg) var(--sora-op), transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--sora-border);
+    border-radius: 15px;
+    font-size: clamp(11.5px, 3.1vw, 14px);
+    line-height: 1.25;
+    text-align: center;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+#sora_rp_calendar.sora-cal.sora-hidden {
+    display: none;
+}
+
+/* ---------- основное содержимое ---------- */
+
+#sora_rp_calendar .sora-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+#sora_rp_calendar .sora-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    max-width: 100%;
+    min-width: 0;
+}
+
+#sora_rp_calendar .sora-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+#sora_rp_calendar .sora-txt {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+}
+
+#sora_rp_calendar .sora-ic {
+    flex: 0 0 auto;
+    width: 1.2em;
+    height: 1.2em;
+    color: var(--sora-accent);
+    opacity: 0.95;
+}
+
+#sora_rp_calendar .sora-ic-sm {
+    width: 0.95em;
+    height: 0.95em;
+}
+
+#sora_rp_calendar .sora-row-place {
+    font-size: 0.88em;
+    opacity: 0.88;
+}
+
+#sora_rp_calendar .sora-row-place .sora-txt {
+    max-width: min(60vw, 420px);
+}
+
+#sora_rp_calendar .sora-manual {
+    display: inline-flex;
+    opacity: 0.7;
+}
+
+#sora_rp_calendar .sora-empty {
+    opacity: 0.75;
+    font-style: italic;
+}
+
+/* ---------- режимы ---------- */
+
+#sora_rp_calendar.sora-mode-compact {
+    min-height: 28px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#sora_rp_calendar.sora-mode-expanded .sora-extra {
+    width: 100%;
+    margin-top: 3px;
+    padding-top: 4px;
+    border-top: 1px dashed var(--sora-border);
+    font-size: 0.86em;
+}
+
+#sora_rp_calendar .sora-row-weather {
+    margin-bottom: 2px;
+    opacity: 0.92;
+}
+
+#sora_rp_calendar .sora-row-weather .sora-item {
+    white-space: normal;
+    text-align: left;
+}
+
+#sora_rp_calendar .sora-raw {
+    max-height: 4.6em;
+    overflow-y: auto;
+    padding: 0 2px;
+    text-align: left;
+    font-size: 0.92em;
+    line-height: 1.3;
+    opacity: 0.7;
+    word-break: break-word;
+    overscroll-behavior: contain;
+}
+
+/* ---------- кнопки ---------- */
+
+#sora_rp_calendar .sora-btns {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    bottom: 3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    z-index: 2;
+}
+
+#sora_rp_calendar .sora-btn {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: var(--sora-accent);
+    cursor: pointer;
+    opacity: 0.8;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+#sora_rp_calendar .sora-btn:hover,
+#sora_rp_calendar .sora-btn:focus-visible {
+    opacity: 1;
+    background: color-mix(in srgb, var(--sora-accent) 18%, transparent);
+}
+
+#sora_rp_calendar .sora-btn:focus-visible {
+    outline: 1px solid var(--sora-accent);
+}
+
+#sora_rp_calendar .sora-btn .sora-ic {
+    width: 17px;
+    height: 17px;
+}
+
+#sora_rp_calendar .sora-chev {
+    transition: transform 0.2s ease;
+}
+
+#sora_rp_calendar.sora-mode-expanded .sora-chev {
+    transform: rotate(-90deg);
+}
+
+#sora_rp_calendar.sora-mode-compact .sora-chev {
+    transform: rotate(90deg);
+}
+
+/* ---------- цветочный декор ---------- */
+
+#sora_rp_calendar .sora-fl {
+    position: absolute;
+    display: block;
+    color: var(--sora-accent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#sora_rp_calendar .sora-fl svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#sora_rp_calendar .sora-fl-a {
+    left: -7px;
+    bottom: -9px;
+    width: 30px;
+    height: 30px;
+    opacity: 0.38;
+    transform: rotate(-14deg);
+}
+
+#sora_rp_calendar .sora-fl-b {
+    right: 20px;
+    bottom: -10px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.26;
+    transform: rotate(24deg);
+}
+
+#sora_rp_calendar .sora-fl-c {
+    left: 15px;
+    top: -6px;
+    width: 14px;
+    height: 14px;
+    opacity: 0.26;
+    transform: rotate(40deg);
+}
+
+#sora_rp_calendar.sora-no-flowers .sora-fl {
+    display: none;
+}
+
+#sora_rp_calendar .sora-main,
+#sora_rp_calendar .sora-btns {
+    position: relative;
+    z-index: 1;
+}
+
+#sora_rp_calendar .sora-btns {
+    position: absolute;
+}
+
+/* ---------- узкие экраны ---------- */
+
+@media (max-width: 520px) {
+    #sora_rp_calendar.sora-cal {
+        width: calc(100% - 8px);
+        padding: 4px 34px 4px 26px;
+        border-radius: 14px;
+    }
+
+    #sora_rp_calendar .sora-row {
+        gap: 11px;
+    }
+
+    #sora_rp_calendar .sora-row-place .sora-txt {
+        max-width: 62vw;
+    }
+}
+
+@media (max-width: 340px) {
+    #sora_rp_calendar .sora-row {
+        gap: 8px;
+    }
+
+    #sora_rp_calendar .sora-ic {
+        width: 1.05em;
+        height: 1.05em;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #sora_rp_calendar .sora-chev,
+    #sora_rp_calendar .sora-btn {
+        transition: none;
+    }
+}
+
+/* ---------- панель настроек ---------- */
+
+.sora-settings .sora-set-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 6px 0;
+}
+
+.sora-settings .sora-set-row > label {
+    flex: 1 1 auto;
+}
+
+.sora-settings .sora-set-row .text_pole,
+.sora-settings .sora-set-row select {
+    flex: 0 1 55%;
+    min-width: 0;
+    margin: 0;
+}
+
+.sora-settings .sora-set-ctl {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sora-settings input[type='color'] {
+    width: 38px;
+    height: 26px;
+    padding: 0;
+    border: 1px solid var(--SmartThemeBorderColor, #888);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+}
+
+.sora-settings input[type='color'].sora-auto {
+    opacity: 0.45;
+}
+
+.sora-settings .sora-set-reset {
+    margin: 0;
+    padding: 2px 8px;
+    font-size: 0.85em;
+}
+
+.sora-settings .sora-set-title {
+    margin: 10px 0 4px;
+    font-weight: 600;
+}
+
+.sora-settings .sora-set-status {
+    min-height: 1.2em;
+    margin: 3px 0;
+    font-size: 0.9em;
+    opacity: 0.85;
+}
+
+.sora-settings .sora-set-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.sora-settings .sora-set-note {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.65;
+}
+
+/* ================================================================== */
+/*  Узоры по сезону / времени суток / погоде                          */
+/* ================================================================== */
+
+#sora_rp_calendar[data-season='spring'] { --sora-decor-base: #f4a7c3; }
+#sora_rp_calendar[data-season='summer'] { --sora-decor-base: #f0cf6a; }
+#sora_rp_calendar[data-season='autumn'] { --sora-decor-base: #e8975a; }
+#sora_rp_calendar[data-season='winter'] { --sora-decor-base: #a9d4f2; }
+
+#sora_rp_calendar[data-tone='sun']   { --sora-tone: #f3cf74; }
+#sora_rp_calendar[data-tone='moon']  { --sora-tone: #cdd5f7; }
+#sora_rp_calendar[data-tone='cloud'] { --sora-tone: #b9c1ce; }
+#sora_rp_calendar[data-tone='rain']  { --sora-tone: #8db4dc; }
+#sora_rp_calendar[data-tone='storm'] { --sora-tone: #a99fd8; }
+#sora_rp_calendar[data-tone='snow']  { --sora-tone: #d7e8f6; }
+#sora_rp_calendar[data-tone='fog']   { --sora-tone: #b8bcc6; }
+
+#sora_rp_calendar .sora-fl-a,
+#sora_rp_calendar .sora-fl-c {
+    color: var(--sora-c-border, var(--sora-decor-base, var(--sora-accent)));
+}
+
+#sora_rp_calendar .sora-fl-b {
+    right: 18px;
+    bottom: -8px;
+    width: 26px;
+    height: 26px;
+    opacity: 0.4;
+    transform: none;
+    color: var(--sora-c-border, var(--sora-tone, var(--sora-accent)));
+}
+
+#sora_rp_calendar .sora-fl-c.sora-fl-star {
+    left: 21px;
+    top: -5px;
+    width: 12px;
+    height: 12px;
+    opacity: 0.45;
+    transform: none;
+    color: var(--sora-c-border, #cdd5f7);
+    animation: sora-twinkle 4.5s ease-in-out infinite;
+}
+
+/* лёгкий оттенок фона по времени суток */
+#sora_rp_calendar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#sora_rp_calendar[data-dp='dawn']::before  { background: linear-gradient(100deg, rgba(255, 186, 160, 0.16), rgba(255, 230, 170, 0.05) 60%, transparent); }
+#sora_rp_calendar[data-dp='day']::before   { background: linear-gradient(100deg, rgba(255, 240, 190, 0.09), transparent 65%); }
+#sora_rp_calendar[data-dp='dusk']::before  { background: linear-gradient(100deg, rgba(255, 140, 110, 0.15), rgba(150, 100, 190, 0.1) 70%, transparent); }
+#sora_rp_calendar[data-dp='night']::before { background: linear-gradient(100deg, rgba(80, 95, 200, 0.2), rgba(40, 40, 110, 0.12) 70%, transparent); }
+
+@keyframes sora-twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #sora_rp_calendar .sora-fl-c.sora-fl-star { animation: none; }
+}
