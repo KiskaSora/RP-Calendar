@@ -8,7 +8,7 @@ import { scanChat, parseDate, parseTime, formatDate, formatTime, detectDecor } f
 const MODULE = 'sora_rp_calendar';
 const PANEL_ID = 'sora_rp_calendar';
 const SETTINGS_ID = 'sora_rp_calendar_settings';
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 
 const MODES = ['compact', 'standard', 'expanded'];
 const MODE_LABELS = { compact: 'Компактный', standard: 'Стандартный', expanded: 'Раскрытый' };
@@ -22,6 +22,7 @@ const DEFAULTS = Object.freeze({
     bgOpacity: 55,
     flowers: true,
     adaptiveDecor: true,
+    artTheme: 'engraving',
     manual: {},
 });
 
@@ -45,12 +46,6 @@ const ICON = {
     chevron: svg('<path d="M9 6l6 6-6 6"/>', 'sora-ic sora-chev'),
     refresh: svg('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4.5V11h-6.5"/>'),
     pencil: svg('<path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19l-4 1z"/>', 'sora-ic sora-ic-sm'),
-    flower:
-        '<svg viewBox="0 0 40 40" aria-hidden="true"><g fill="currentColor">' +
-        [0, 72, 144, 216, 288]
-            .map((a) => `<path d="M20 20C13.5 14.5 14 6.5 20 3c6 3.5 6.5 11.5 0 17z" transform="rotate(${a} 20 20)"/>`)
-            .join('') +
-        '</g><circle cx="20" cy="20" r="2.4" fill="#fff" fill-opacity=".55"/></svg>',
 };
 
 
@@ -58,73 +53,23 @@ const ICON = {
 /*  Узоры: сезон / время суток / погода                                 */
 /* ------------------------------------------------------------------ */
 
-const G = (inner) => `<svg viewBox="0 0 40 40" aria-hidden="true">${inner}</svg>`;
-const rot = (angles, fn) => angles.map((a) => fn(a)).join('');
-const CLOUD = (t = '') =>
-    `<g fill="currentColor" transform="${t}"><circle cx="14" cy="24" r="6"/><circle cx="22" cy="19" r="8"/><circle cx="29" cy="25" r="5.5"/><rect x="14" y="24" width="15" height="6.5" rx="3.2"/></g>`;
-const SUN = (t = '') =>
-    `<g transform="${t}"><circle cx="20" cy="20" r="6.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round">${rot(
-        [0, 45, 90, 135, 180, 225, 270, 315],
-        (a) => `<path d="M20 5.5v4" transform="rotate(${a} 20 20)"/>`,
-    )}</g></g>`;
-const MOON = (t = '') => `<path transform="${t}" d="M25 5a15 15 0 1 0 10 22A12.5 12.5 0 0 1 25 5z" fill="currentColor"/>`;
+const ART_THEMES = { engraving: 'Книжная гравюра', pearl: 'Перламутр' };
 
-const GLYPH = {
-    sakura: ICON.flower,
-    daisy: G(
-        `<g fill="currentColor">${rot([0, 45, 90, 135, 180, 225, 270, 315], (a) => `<ellipse cx="20" cy="9.5" rx="3.3" ry="6.5" transform="rotate(${a} 20 20)"/>`)}</g><circle cx="20" cy="20" r="4.4" fill="#fff" fill-opacity=".6"/>`,
-    ),
-    leaf: G(
-        '<path d="M20 3c10.5 8 13 21 0 34C7 24 9.5 11 20 3z" fill="currentColor"/><path d="M20 10v27M20 20l-5-4M20 26l6-5" stroke="#fff" stroke-opacity=".5" stroke-width="1.4" stroke-linecap="round" fill="none"/>',
-    ),
-    snowflake: G(
-        `<g stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none">${rot([0, 60, 120], (a) => `<g transform="rotate(${a} 20 20)"><path d="M20 4v32M15 9.5l5 4 5-4M15 30.5l5-4 5 4"/></g>`)}</g>`,
-    ),
-    sun: G(SUN()),
-    moon: G(MOON()),
-    cloud: G(CLOUD()),
-    partlySun: G(SUN('translate(-5 -6) scale(.78 .78) translate(5 7)') + CLOUD('translate(3 5) scale(.9)')),
-    partlyMoon: G(MOON('translate(-3 -4) scale(.7) translate(5 5)') + CLOUD('translate(3 5) scale(.9)')),
-    rain: G(
-        CLOUD('translate(0 -6)') +
-            '<g stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M13 29l-2 6M20 29l-2 6M27 29l-2 6"/></g>',
-    ),
-    storm: G(CLOUD('translate(0 -6)') + '<path d="M21.5 23l-6 9h5l-2 7.5 8-10.5h-5.500l3-6z" fill="#fff" fill-opacity=".85"/>'),
-    snow: G(
-        CLOUD('translate(0 -6)') +
-            '<g fill="currentColor"><circle cx="13" cy="31" r="1.9"/><circle cx="20" cy="34.5" r="1.9"/><circle cx="27" cy="31" r="1.9"/></g>',
-    ),
-    fog: G(
-        '<g stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M8 13h20M13 20h20M8 27h18M14 34h14"/></g>',
-    ),
-    star: G('<path d="M20 3l3.2 13.8L37 20l-13.8 3.2L20 37l-3.2-13.8L3 20l13.8-3.2z" fill="currentColor"/>'),
-};
-
-const SEASON_GLYPH = { spring: 'sakura', summer: 'daisy', autumn: 'leaf', winter: 'snowflake' };
-
-/** Подбирает три узора по датам/времени/погоде. Возвращает html и метки для CSS. */
-function decorFor(decor, adaptive) {
-    if (!adaptive) {
-        return { season: 'none', dp: 'none', tone: 'none', a: GLYPH.sakura, b: GLYPH.sakura, c: GLYPH.sakura };
-    }
-    const season = decor.season || 'spring';
-    const dp = decor.daypart || 'day';
+function decorFor({ season, daypart, weather }, adaptive) {
+    if (!adaptive) return { season: 'none', dp: 'none', a: 'spring', b: 'spring', c: 'spring' };
+    const dp = daypart || 'day';
     const night = dp === 'night';
-    const wx = decor.weather;
+    let b = weather;
+    if (weather === 'clear' || weather === 'none') b = dp;
+    else if (weather === 'partly') b = night ? 'partly-night' : 'partly-day';
+    else if (night && ['rain', 'storm', 'snow', 'fog'].includes(weather)) b += '-night';
+    const a = season || 'spring';
+    return { season: a, dp, a, b, c: night ? 'star' : a, cStar: night };
+}
 
-    let tone;
-    let b;
-    if (wx === 'storm') [tone, b] = ['storm', GLYPH.storm];
-    else if (wx === 'snow') [tone, b] = ['snow', GLYPH.snow];
-    else if (wx === 'rain') [tone, b] = ['rain', GLYPH.rain];
-    else if (wx === 'fog') [tone, b] = ['fog', GLYPH.fog];
-    else if (wx === 'cloud') [tone, b] = ['cloud', GLYPH.cloud];
-    else if (wx === 'partly') [tone, b] = night ? ['moon', GLYPH.partlyMoon] : ['sun', GLYPH.partlySun];
-    else [tone, b] = night ? ['moon', GLYPH.moon] : ['sun', GLYPH.sun];
-
-    const a = GLYPH[SEASON_GLYPH[season]];
-    const c = night ? GLYPH.star : a;
-    return { season, dp, tone, a, b, c, cStar: night };
+function ornament(theme, name) {
+    const url = new URL(`./assets/${theme}/${name}.png`, import.meta.url);
+    return `<img src="${esc(url.href)}" alt="" draggable="false">`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -140,6 +85,7 @@ function getSettings() {
     for (const k of Object.keys(DEFAULTS)) {
         if (s[k] === undefined) s[k] = typeof DEFAULTS[k] === 'object' ? {} : DEFAULTS[k];
     }
+    if (!Object.hasOwn(ART_THEMES, s.artTheme)) s.artTheme = DEFAULTS.artTheme;
     if (!MODES.includes(s.mode)) s.mode = 'standard';
     return s;
 }
@@ -262,6 +208,7 @@ function compose(s) {
         mode: s.mode,
         flowers: !!s.flowers,
         adaptive: !!s.adaptiveDecor,
+        artTheme: s.artTheme,
         decor: detectDecor(date, time, weather),
     };
 }
@@ -270,12 +217,11 @@ function compose(s) {
 /*  Панель                                                              */
 /* ------------------------------------------------------------------ */
 
-function template(vm) {
-    const d = decorFor(vm.decor, vm.adaptive);
-    const flowers =
-        `<span class="sora-fl sora-fl-a">${d.a}</span>` +
-        `<span class="sora-fl sora-fl-b">${d.b}</span>` +
-        `<span class="sora-fl sora-fl-c${d.cStar ? ' sora-fl-star' : ''}">${d.c}</span>`;
+function template(vm, d) {
+    const flowers = !vm.flowers ? '' :
+        `<span class="sora-fl sora-fl-a">${ornament(vm.artTheme, d.a)}</span>` +
+        `<span class="sora-fl sora-fl-b">${ornament(vm.artTheme, d.b)}</span>` +
+        `<span class="sora-fl sora-fl-c${d.cStar ? ' sora-fl-star' : ''}">${ornament(vm.artTheme, d.c)}</span>`;
 
     const modeTitle = `Режим: ${MODE_LABELS[vm.mode]} — нажмите, чтобы переключить`;
     const buttons =
@@ -363,7 +309,6 @@ function render() {
     const dc = decorFor(vm.decor, vm.adaptive);
     el.dataset.season = dc.season;
     el.dataset.dp = dc.dp;
-    el.dataset.tone = dc.tone;
 
     const setVar = (name, val) => (val ? el.style.setProperty(name, val) : el.style.removeProperty(name));
     setVar('--sora-c-text', s.textColor);
@@ -374,7 +319,7 @@ function render() {
     const sig = JSON.stringify(vm);
     if (el.dataset.sig !== sig) {
         el.dataset.sig = sig;
-        el.innerHTML = template(vm);
+        el.innerHTML = template(vm, dc);
     }
 }
 
@@ -531,6 +476,12 @@ function buildSettingsUI() {
                 <input type="range" id="sora_set_op" min="0" max="100" step="5">
             </div>
 
+            <div class="sora-set-row">
+                <label for="sora_set_art">Оформление узоров</label>
+                <select id="sora_set_art" class="text_pole">
+                    ${Object.entries(ART_THEMES).map(([key, title]) => `<option value="${key}">${title}</option>`).join('')}
+                </select>
+            </div>
             <label class="checkbox_label" for="sora_set_flowers">
                 <input type="checkbox" id="sora_set_flowers">
                 <span>Декор (узоры по краям)</span>
@@ -608,6 +559,10 @@ function wireSettingsUI() {
         $id('sora_set_op_val').textContent = e.target.value + '%';
         changed();
     });
+    $id('sora_set_art').addEventListener('change', (e) => {
+        s().artTheme = e.target.value;
+        changed();
+    });
     $id('sora_set_flowers').addEventListener('change', (e) => {
         s().flowers = e.target.checked;
         changed();
@@ -649,6 +604,7 @@ function syncSettingsUI() {
     const s = getSettings();
     $id('sora_set_enabled').checked = !!s.enabled;
     $id('sora_set_mode').value = s.mode;
+    $id('sora_set_art').value = s.artTheme;
     $id('sora_set_flowers').checked = !!s.flowers;
     $id('sora_set_adaptive').checked = !!s.adaptiveDecor;
     $id('sora_set_op').value = s.bgOpacity;

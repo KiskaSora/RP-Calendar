@@ -18,7 +18,7 @@
     max-width: 100%;
     min-height: 34px;
     margin: 4px auto 3px;
-    padding: 5px 38px 5px 30px;
+    padding: 5px 54px 5px 30px;
     overflow: hidden;
     color: var(--sora-text);
     background: var(--sora-bg);
@@ -212,28 +212,28 @@
     z-index: 0;
 }
 
-#sora_rp_calendar .sora-fl svg {
+#sora_rp_calendar .sora-fl img {
     display: block;
     width: 100%;
     height: 100%;
 }
 
 #sora_rp_calendar .sora-fl-a {
-    left: -7px;
-    bottom: -9px;
-    width: 30px;
-    height: 30px;
-    opacity: 0.38;
-    transform: rotate(-14deg);
+    left: 0;
+    bottom: 0;
+    width: 24px;
+    height: 24px;
+    opacity: 0.9;
+    transform: rotate(-10deg);
 }
 
 #sora_rp_calendar .sora-fl-b {
-    right: 20px;
-    bottom: -10px;
-    width: 20px;
-    height: 20px;
-    opacity: 0.26;
-    transform: rotate(24deg);
+    right: 32px;
+    top: 50%;
+    width: 21px;
+    height: 21px;
+    opacity: 0.96;
+    transform: translateY(-50%);
 }
 
 #sora_rp_calendar .sora-fl-c {
@@ -264,7 +264,7 @@
 @media (max-width: 520px) {
     #sora_rp_calendar.sora-cal {
         width: calc(100% - 8px);
-        padding: 4px 34px 4px 26px;
+        padding: 4px 54px 4px 26px;
         border-radius: 14px;
     }
 
@@ -370,34 +370,6 @@
 /* ================================================================== */
 /*  Узоры по сезону / времени суток / погоде                          */
 /* ================================================================== */
-
-#sora_rp_calendar[data-season='spring'] { --sora-decor-base: #f4a7c3; }
-#sora_rp_calendar[data-season='summer'] { --sora-decor-base: #f0cf6a; }
-#sora_rp_calendar[data-season='autumn'] { --sora-decor-base: #e8975a; }
-#sora_rp_calendar[data-season='winter'] { --sora-decor-base: #a9d4f2; }
-
-#sora_rp_calendar[data-tone='sun']   { --sora-tone: #f3cf74; }
-#sora_rp_calendar[data-tone='moon']  { --sora-tone: #cdd5f7; }
-#sora_rp_calendar[data-tone='cloud'] { --sora-tone: #b9c1ce; }
-#sora_rp_calendar[data-tone='rain']  { --sora-tone: #8db4dc; }
-#sora_rp_calendar[data-tone='storm'] { --sora-tone: #a99fd8; }
-#sora_rp_calendar[data-tone='snow']  { --sora-tone: #d7e8f6; }
-#sora_rp_calendar[data-tone='fog']   { --sora-tone: #b8bcc6; }
-
-#sora_rp_calendar .sora-fl-a,
-#sora_rp_calendar .sora-fl-c {
-    color: var(--sora-c-border, var(--sora-decor-base, var(--sora-accent)));
-}
-
-#sora_rp_calendar .sora-fl-b {
-    right: 18px;
-    bottom: -8px;
-    width: 26px;
-    height: 26px;
-    opacity: 0.4;
-    transform: none;
-    color: var(--sora-c-border, var(--sora-tone, var(--sora-accent)));
-}
 
 #sora_rp_calendar .sora-fl-c.sora-fl-star {
     left: 21px;

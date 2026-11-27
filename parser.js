@@ -221,10 +221,7 @@ function lastLabelIndex(re, text) {
     return last;
 }
 
-/** Достаёт последнее игровое время из одного сообщения (или null). */
-export function parseMessage(mes) {
-    if (typeof mes !== 'string' || mes.length < 6) return null;
-
+function parseVisibleMessage(mes) {
     // 1) Явные <infoblock>…</infoblock>: берём последний, который разобрался.
     const blocks = [...mes.matchAll(/<infoblock\b[^>]*>([\s\S]*?)<\/infoblock\s*>/gi)];
     for (let i = blocks.length - 1; i >= 0; i--) {
@@ -237,6 +234,45 @@ export function parseMessage(mes) {
     if (idx < 0) idx = lastLabelIndex(RE_TIME_LABEL, mes);
     if (idx < 0) return null;
     return parseBlock(mes.slice(idx, idx + 900));
+}
+
+// Скрытая метка содержит единую пару: повреждённые дату и время не смешиваем.
+const HIDDEN_RP = /^\s*\[RP_DATE\s*:\s*(\d{1,2}\.\d{1,2}\.\d{4})\s+(\d{1,2}:\d{2})\s*\]\s*$/i;
+const HIDDEN_TEL = /^\s*tel:time\s*:\s*(\d{1,2}:\d{2})\s+(\d{1,2}\.\d{1,2}\.\d{4})\s*$/i;
+
+/** Достаёт игровое время из видимого инфоблока и служебных комментариев. */
+export function parseMessage(mes) {
+    if (typeof mes !== 'string' || mes.length < 6) return null;
+    if (!mes.includes('<!--')) return parseVisibleMessage(mes);
+
+    let stamp = null;
+    let end = 0;
+    const visible = mes.replace(/<!--([\s\S]*?)-->/g, (raw, body, offset) => {
+        const rp = HIDDEN_RP.exec(body);
+        const tel = rp ? null : HIDDEN_TEL.exec(body);
+        if (rp || tel) {
+            const date = parseDate(rp ? rp[1] : tel[2]);
+            const time = parseTime(rp ? rp[2] : tel[1]);
+            if (date && time) {
+                stamp = { date, time, raw };
+                end = offset + raw.length;
+            }
+        }
+        // Сохраняем позиции видимого текста для сравнения порядка меток.
+        return '\n'.padEnd(raw.length, ' ');
+    });
+
+    if (!stamp) return parseVisibleMessage(visible);
+    const newer = parseVisibleMessage(visible.slice(end));
+    if (newer) return newer;
+
+    const block = parseVisibleMessage(visible);
+    const fields = normalize(visible);
+    return {
+        ...stamp,
+        place: block?.place || clean(RE.place.exec(fields)?.[1]),
+        weather: block?.weather || clean(RE.weather.exec(fields)?.[1]),
+    };
 }
 
 /**
