@@ -8,7 +8,7 @@ import { scanChat, parseDate, parseTime, formatDate, formatTime, detectDecor } f
 const MODULE = 'sora_rp_calendar';
 const PANEL_ID = 'sora_rp_calendar';
 const SETTINGS_ID = 'sora_rp_calendar_settings';
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 
 const MODES = ['compact', 'standard', 'expanded'];
 const MODE_LABELS = { compact: 'Компактный', standard: 'Стандартный', expanded: 'Раскрытый' };
@@ -218,10 +218,8 @@ function compose(s) {
 /* ------------------------------------------------------------------ */
 
 function template(vm, d) {
-    const flowers = !vm.flowers ? '' :
-        `<span class="sora-fl sora-fl-a">${ornament(vm.artTheme, d.a)}</span>` +
-        `<span class="sora-fl sora-fl-b">${ornament(vm.artTheme, d.b)}</span>` +
-        `<span class="sora-fl sora-fl-c${d.cStar ? ' sora-fl-star' : ''}">${ornament(vm.artTheme, d.c)}</span>`;
+    const dateIcon = vm.flowers ? ornament(vm.artTheme, d.a) : ICON.cal;
+    const timeIcon = vm.flowers ? ornament(vm.artTheme, d.b) : ICON.clock;
 
     const modeTitle = `Режим: ${MODE_LABELS[vm.mode]} — нажмите, чтобы переключить`;
     const buttons =
@@ -237,8 +235,8 @@ function template(vm, d) {
         main = `<div class="sora-row sora-empty"><span class="sora-item">${ICON.cal}<span class="sora-txt">Игровое время не найдено</span></span></div>`;
     } else {
         const items = [];
-        if (vm.dateText) items.push(`<span class="sora-item sora-date">${ICON.cal}<span class="sora-txt">${esc(vm.dateText)}</span></span>`);
-        if (vm.timeText) items.push(`<span class="sora-item sora-time">${ICON.clock}<span class="sora-txt">${esc(vm.timeText)}</span></span>`);
+        if (vm.dateText) items.push(`<span class="sora-item sora-date">${dateIcon}<span class="sora-txt">${esc(vm.dateText)}</span></span>`);
+        if (vm.timeText) items.push(`<span class="sora-item sora-time">${timeIcon}<span class="sora-txt">${esc(vm.timeText)}</span></span>`);
         main = `<div class="sora-row sora-row-main">${items.join('')}${vm.manual ? `<span class="sora-manual" title="Ручные значения">${ICON.pencil}</span>` : ''}</div>`;
 
         if (vm.mode !== 'compact' && vm.place) {
@@ -247,12 +245,12 @@ function template(vm, d) {
         if (vm.mode === 'expanded') {
             let extra = '';
             if (vm.weather) extra += `<div class="sora-row sora-row-weather"><span class="sora-item">${ICON.cloud}<span class="sora-txt">${esc(vm.weather)}</span></span></div>`;
-            if (vm.raw) extra += `<div class="sora-raw">${esc(vm.raw)}</div>`;
+            if (vm.raw) extra += `<details class="sora-source"><summary>Источник</summary><div class="sora-raw">${esc(vm.raw)}</div></details>`;
             if (extra) main += `<div class="sora-extra">${extra}</div>`;
         }
     }
 
-    return `${flowers}<div class="sora-main">${main}</div>${buttons}`;
+    return `<div class="sora-main">${main}</div>${buttons}`;
 }
 
 function onPanelClick(e) {
